@@ -7,6 +7,7 @@ def main():
 
     streamManager.setUrl("https://www.twitch.tv/emongg")
     streamManager.setQuality("best")
+
     streamObject = streamManager.getStreamObject()
 
     data = streamObject.read(1024)

@@ -48,13 +48,6 @@ class StreamManager():
 
     ###########################################################################
 
-    def getStream(self):
-
-        url     = self.getUrl()
-        quality = self.getQuality()
-
-        return self.getStream(url, quality)
-
     def getStream(self, url, quality):
 
         if url == None:
@@ -67,11 +60,7 @@ class StreamManager():
 
     def getStreamObject(self):
 
-        stream = self.getStream()
-
-        return self.getStreamObject(stream)
-
-    def getStreamObject(self, stream):
+        stream = self.getStream(self.url, self.quality)
 
         if stream == None:
             sys.exit("stream not defined")
