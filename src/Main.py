@@ -1,20 +1,17 @@
 from StreamManager import StreamManager
-import sys
+import time
 
 def main():
 
     streamManager = StreamManager()
 
-    streamManager.setUrl("https://www.twitch.tv/emongg")
+    start = time.time()
+
+    streamManager.setUrl("https://www.twitch.tv/xqcow")
     streamManager.setQuality("best")
+    streamManager.setLogOutputPath("./output/" + str(start) + ".log")
+    streamManager.setVideoOutputPath("./output/" + str(start) + ".avi")
 
-    streamObject = streamManager.getStreamObject()
-
-    data = streamObject.read(1024)
-
-    print("test")
-
-    print(sys.getsizeof(data))
-    print(len(data))
+    streamManager.startScrape(start)
 
 main()
