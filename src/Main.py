@@ -19,6 +19,8 @@ def main():
     streamManager.setQuality("best")
     streamManager.setLogOutputPath("./output/" + str(start) + ".log")
     streamManager.setVideoOutputPath("./output/" + str(start) + ".avi")
+    streamManager.setScrapeEndConditon("iterations")
+    streamManager.setScrapeEndValue(100)
 
     streamManager.startScrape(start)
 

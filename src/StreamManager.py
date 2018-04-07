@@ -5,11 +5,13 @@ import os
 
 class StreamManager():
 
-    url             = None
-    quality         = None
-    logOutputPath   = None
-    videoOutputPath = None
-    session         = None
+    url                 = None
+    quality             = None
+    logOutputPath       = None
+    videoOutputPath     = None
+    session             = None
+    scrapeEndConditon   = None
+    scrapeEndValue      = None
 
     def __init__(self):
 
@@ -58,6 +60,24 @@ class StreamManager():
     def setVideoOutputPath(self, videoOutputPath):
         self.videoOutputPath = videoOutputPath
 
+    def getScrapeEndConditon(self):
+        if self.scrapeEndConditon != None:
+            return self.scrapeEndConditon
+        else:
+            sys.exit("scrapeEndConditon is not defined")
+
+    def setScrapeEndConditon(self, scrapeEndConditon):
+        self.scrapeEndConditon = scrapeEndConditon
+
+    def getScrapeEndValue(self):
+        if self.scrapeEndValue != None:
+            return self.scrapeEndValue
+        else:
+            sys.exit("scrapeEndValue is not defined")
+
+    def setScrapeEndValue(self, scrapeEndValue):
+        self.scrapeEndValue = scrapeEndValue
+
     ###########################################################################
 
     def getStream(self):
@@ -78,6 +98,29 @@ class StreamManager():
 
         return stream.open()
 
+    def checkScrapeEndConditon(self, iterations, timeDuration, fileSize):
+
+        scrapeEndValue = self.getScrapeEndValue()
+        scrapeEndConditon = self.getScrapeEndConditon()
+
+        if scrapeEndConditon == "iterations":
+            if iterations >= scrapeEndValue:
+                return False
+            else:
+                return True
+        elif scrapeEndConditon == "timeDuration":
+            if timeDuration >= scrapeEndValue:
+                return False
+            else:
+                return True
+        elif scrapeEndConditon == "fileSize":
+            if fileSize >= scrapeEndValue:
+                return False
+            else:
+                return True
+        else:
+            sys.exit("scrapeEndConditon does not match a supported condition i.e. (iterations, timeDuration, fileSize)")
+
     def startScrape(self, start):
 
         streamObject = self.getStreamObject()
@@ -88,12 +131,13 @@ class StreamManager():
         logFile = open(logOutputPath, "a")
         videoFile = open(videoOutputPath, "wb")
 
-        average = -1
-        sum = -1
-
         i = 0
+        sum = -1
+        average = -1
+        currentSize = os.stat(videoOutputPath).st_size
+        duration = round(time.time() - start, 4)
 
-        while i < 1024:
+        while self.checkScrapeEndConditon(i, duration, currentSize):
 
             if average == -1:
 
@@ -107,7 +151,7 @@ class StreamManager():
 
             videoFile.write(data)
 
-            after = os.stat(videoOutputPath).st_size
+            after = currentSize = os.stat(videoOutputPath).st_size
 
             difference = after - before
 
