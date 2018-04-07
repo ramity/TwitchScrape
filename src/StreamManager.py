@@ -65,7 +65,12 @@ class StreamManager():
         url = self.getUrl()
         quality = self.getQuality()
 
-        return self.session.streams(url)[quality]
+        streams = self.session.streams(url)
+
+        if quality in streams:
+            return streams[quality]
+        else:
+            sys.exit("Error getting stream by specified quality. The selected stream is most likely offline")
 
     def getStreamObject(self):
 
