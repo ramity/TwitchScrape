@@ -23,7 +23,7 @@ class StreamParser():
         staticMap = np.zeros(previous["gray"].shape, dtype=np.uint8)
         max = 1
 
-        for z in range(0, 10):
+        for z in range(0, 100):
 
             current["ret"], current["frame"] = capture.read()
             current["gray"] = cv2.cvtColor(current["frame"], cv2.COLOR_BGR2GRAY)
@@ -34,35 +34,32 @@ class StreamParser():
             for potentialKeypoint in potentialKeypoints:
                 xa = int(potentialKeypoint.pt[0])
                 ya = int(potentialKeypoint.pt[1])
+                da = int(potentialKeypoint.size)
+                aa = int(potentialKeypoint.angle)
 
-                if staticMap[ya][xa] < max / 3:
+                found = False
 
-                    da = int(potentialKeypoint.size)
-                    aa = int(potentialKeypoint.angle)
+                for previousKeypoint in previous["keypoints"]:
+                    xb = int(previousKeypoint.pt[0])
+                    yb = int(previousKeypoint.pt[1])
+                    db = int(previousKeypoint.size)
+                    ab = int(previousKeypoint.angle)
 
-                    found = False
+                    if xa == xb and ya == yb and da == db and aa == ab:
+                        found = True
+                        break
 
-                    for previousKeypoint in previous["keypoints"]:
-                        xb = int(previousKeypoint.pt[0])
-                        yb = int(previousKeypoint.pt[1])
-                        db = int(previousKeypoint.size)
-                        ab = int(previousKeypoint.angle)
+                if found or staticMap[ya][xa] > max / 4:
+                    staticMap[ya][xa] += 1
 
-                        if xa == xb and ya == yb and da == db and aa == ab:
-                            found = True
-                            break
-
-                    if found:
-                        staticMap[ya][xa] += 1
-
-                        if staticMap[ya][xa] > max:
-                            max = staticMap[ya][xa]
-                    else:
-                        current["keypoints"].append(potentialKeypoint)
+                    if staticMap[ya][xa] > max:
+                        max = staticMap[ya][xa]
+                else:
+                    current["keypoints"].append(potentialKeypoint)
 
             current["keypointsImage"] = cv2.drawKeypoints(current["blur"], current["keypoints"], current["blur"], flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            print(z, "outof", 9, flush=True)
+            print(z, "outof", 99, "max", max, flush=True)
 
             cv2.imwrite("output/reee/kps" + str(z) + ".jpg", current["keypointsImage"])
 
